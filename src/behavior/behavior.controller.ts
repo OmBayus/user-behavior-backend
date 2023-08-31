@@ -2,21 +2,9 @@ import express from "express";
 
 import behaviorRepository from "./behavior.repository";
 
-export const findAll = async (req: express.Request, res: express.Response) => {
+export const getFromBehavior = async (req: express.Request, res: express.Response) => {
   try {
-    const behaviors = await behaviorRepository.findAll();
-    return res.status(200).json({
-      behaviors,
-    });
-  } catch (error) {
-    console.log(error);
-    return res.sendStatus(400);
-  }
-};
-
-export const findOne = async (req: express.Request, res: express.Response) => {
-  try {
-    const behavior = await behaviorRepository.findOne(req.params.id);
+    const behavior = await behaviorRepository.getFromBehavior(req.params.id);
     return res.status(200).json({
       behavior,
     });

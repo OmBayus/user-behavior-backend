@@ -3,10 +3,7 @@ import BehaviorModel from "./models/behavior.model";
 import CreateBehaviorDto from "./dtos/behavior.dto";
 
 export default {
-  findAll: () => {
-    return BehaviorModel.find({ isDeleted: false });
-  },
-  findOne: (id: string) => {
+  getFromBehavior: (id: string) => {
     return BehaviorModel.findById(id, { isDeleted: false });
   },
 
