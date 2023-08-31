@@ -4,9 +4,9 @@ import geoip from 'geoip-lite';
 
 import behaviorRepository from "./behavior.repository";
 
-export const getFromBehavior = async (req: express.Request, res: express.Response) => {
+export const getBehaviorByFormId = async (req: express.Request, res: express.Response) => {
   try {
-    const behavior = await behaviorRepository.getFromBehavior(req.params.id);
+    const behavior = await behaviorRepository.getBehaviorByFormId(req.params.formId);
     return res.status(200).json({
       behavior,
     });

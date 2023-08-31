@@ -1,8 +1,8 @@
 import BehaviorModel from "./models/behavior.model";
 
 export default {
-  getFromBehavior: (id: string) => {
-    return BehaviorModel.findById(id, { isDeleted: false });
+  getBehaviorByFormId: (id: string) => {
+    return BehaviorModel.find({ formId: id });
   },
 
   create: (data: any) => {

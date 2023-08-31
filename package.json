@@ -12,6 +12,7 @@
   "license": "ISC",
   "devDependencies": {
     "@types/compression": "^1.7.2",
+    "@types/cors": "^2.8.13",
     "@types/geoip-lite": "^1.4.1",
     "@types/ua-parser-js": "^0.7.37",
     "nodemon": "^3.0.1",

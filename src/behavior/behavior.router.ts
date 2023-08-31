@@ -2,9 +2,9 @@ import express from "express";
 
 const router = express.Router();
 
-import { getFromBehavior, create } from "./behavior.controller";
+import { getBehaviorByFormId, create } from "./behavior.controller";
 
-router.get("/getFromBehavior", getFromBehavior);
+router.get("/getBehaviorByFormId/:formId", getBehaviorByFormId);
 router.post("/create", create);
 
 export default router;
