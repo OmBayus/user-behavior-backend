@@ -2,10 +2,11 @@ import * as mongoose from "mongoose";
 
 const behaviorSchema = new mongoose.Schema({
   formId: String,
+  ipAddress: String,
+  device: String,
+  country: String,
   activeTime: Number,
   inactiveTime: Number,
-  location: String,
-  device: String,
   submissionDate: Date,
   fields: [{
     name: String,
