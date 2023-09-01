@@ -8,16 +8,20 @@ const behaviorSchema = new mongoose.Schema({
   activeTime: Number,
   inactiveTime: Number,
   submissionDate: Date,
-  fields: [{
-    name: String,
-    type: String,
-    totalTime: Number,
-  }],
-  actions: [{
-    name: String,
-    type: String,
-    date: Date,
-  }],
+  fields: Array,
+  actions: Array,
+  // fields: [{
+  //   id: String,
+  //   name: String,
+  //   type: String,
+  //   totalTime: Number,
+  // }],
+  // actions: [{
+  //   fieldId: String,
+  //   name: String,
+  //   type: String,
+  //   date: Number,
+  // }],
 });
 
 export default mongoose.model("behavior", behaviorSchema);
