@@ -3,45 +3,88 @@ import parseUserAgent from "../utils/parseUserAgent";
 import geoip from "geoip-lite";
 
 import behaviorRepository from "./behavior.repository";
-
-// totalFormDuration: {
-//   shortest: 0,
-//   average: 0,
-//   longest: 0
-// },
-// formFocusedDuration: {
-//   shortest: 0,
-//   average: 0,
-//   longest: 0
-// },
-// inputFocusedDuration: {
-//   shortest: 0,
-//   average: 0,
-//   longest: 0
-// },
-// submissionTime: {
-//   shortest: 0,
-//   average: 0,
-//   longest: 0
-// },
-// country: {
-//   most: '',
-//   least: ''
-// },
-// device: {
-//   most: '',
-//   least: ''
-// },
-// submissions: []
+import {
+  convertTimeStampToHourAndMinute,
+  convertMinuteToHourAndMinute,
+} from "../utils/date.converter";
 
 export const getBehaviorByFormId = async (
   req: express.Request,
   res: express.Response
 ) => {
   try {
+    let result = {
+      success: false,
+      message: "",
+      totalFormDuration: {
+        shortest: "00:00",
+        average: "00:00",
+        longest: "00:00",
+      },
+      formFocusedDuration: {
+        shortest: "00:00",
+        average: "00:00",
+        longest: "00:00",
+      },
+      inputFocusedDuration: {
+        shortest: {
+          name: "",
+          type: "",
+          duration: "00:00",
+        },
+        average: {
+          duration: "00:00",
+        },
+        longest: {
+          name: "",
+          type: "",
+          duration: "00:00",
+        },
+      },
+      submissionTime: {
+        earliest: {
+          country: "",
+          time: "00:00",
+        },
+        average: {
+          time: "00:00",
+        },
+        latest: {
+          country: "",
+          time: "00:00",
+        },
+      },
+      country: {
+        most: {
+          name: "",
+          count: 0,
+        },
+        least: {
+          name: "",
+          count: 0,
+        },
+      },
+      device: {
+        most: {
+          name: "",
+          count: 0,
+        },
+        least: {
+          name: "",
+          count: 0,
+        },
+      },
+    };
+
     const submissions = await behaviorRepository.getBehaviorByFormId(
       req.params.formId
     );
+
+    // if no submissions found
+    if (submissions === undefined || submissions.length === 0) {
+      result.message = "No submissions found";
+      return res.status(200).json(result);
+    }
 
     // totalFormDuration
     const shortestTotalFormDuration = submissions.reduce((a, b) =>
@@ -54,48 +97,88 @@ export const getBehaviorByFormId = async (
     const longestTotalFormDuration = submissions.reduce((a, b) =>
       a.activeTime + a.inactiveTime > b.activeTime + b.inactiveTime ? a : b
     );
-    const totalFormDuration = {
-      shortest:
-        shortestTotalFormDuration.activeTime +
-        shortestTotalFormDuration.inactiveTime,
-      average: averageTotalFormDuration,
-      longest:
+
+    result.totalFormDuration = {
+      shortest: convertTimeStampToHourAndMinute(
         longestTotalFormDuration.activeTime +
-        longestTotalFormDuration.inactiveTime,
+          longestTotalFormDuration.inactiveTime
+      ),
+      average: convertTimeStampToHourAndMinute(averageTotalFormDuration),
+      longest: convertTimeStampToHourAndMinute(
+        longestTotalFormDuration.activeTime +
+          longestTotalFormDuration.inactiveTime
+      ),
     };
 
     // formFocusedDuration
-    const formFocusedDuration = {
-      shortest: submissions.reduce((a, b) =>
-        a.activeTime < b.activeTime ? a : b
-      ).activeTime,
-      average: Math.trunc(
-        submissions.reduce((a, b) => a + b.activeTime, 0) / submissions.length
+    result.formFocusedDuration = {
+      shortest: convertTimeStampToHourAndMinute(
+        submissions.reduce((a, b) => (a.activeTime < b.activeTime ? a : b))
+          .activeTime
       ),
-      longest: submissions.reduce((a, b) =>
-        a.activeTime > b.activeTime ? a : b
-      ).activeTime,
+      average: convertTimeStampToHourAndMinute(
+        Math.trunc(
+          submissions.reduce((a, b) => a + b.activeTime, 0) / submissions.length
+        )
+      ),
+      longest: convertTimeStampToHourAndMinute(
+        submissions.reduce((a, b) => (a.activeTime > b.activeTime ? a : b))
+          .activeTime
+      ),
     };
 
-    const inputFocusedDurations = submissions.map((submission: any) => {
-      // return submission.fields.reduce((a, b) => ab.totalTime ? a : b).totalTime
-      return Math.trunc(
-        submission.fields.reduce((a: any, b: any) => a + b.totalTime, 0)
-      );
+    // inputFocusedDuration
+    let shortestInputFocusedDuration = {
+      name: "",
+      type: "",
+      duration: Number.MAX_SAFE_INTEGER,
+    };
+    let averageInputFocusedDuration = { duration: 0 };
+    let longestInputFocusedDuration = {
+      name: "",
+      type: "",
+      duration: Number.MIN_SAFE_INTEGER,
+    };
+
+    submissions.forEach((submission: any) => {
+      submission.fields.forEach((field: any) => {
+        if (field.totalTime < shortestInputFocusedDuration.duration) {
+          shortestInputFocusedDuration.name = field.name;
+          shortestInputFocusedDuration.type = field.type;
+          shortestInputFocusedDuration.duration = field.totalTime;
+        }
+        if (field.totalTime > longestInputFocusedDuration.duration) {
+          longestInputFocusedDuration.name = field.name;
+          longestInputFocusedDuration.type = field.type;
+          longestInputFocusedDuration.duration = field.totalTime;
+        }
+        averageInputFocusedDuration.duration += field.totalTime;
+      });
     });
 
-    // inputFocusedDuration
-    const inputFocusedDuration = {
-      shortest: inputFocusedDurations.reduce((a: any, b: any) =>
-        a < b ? a : b
-      ),
-      average: Math.trunc(
-        inputFocusedDurations.reduce((a: any, b: any) => a + b, 0) /
-          submissions.length
-      ),
-      longest: inputFocusedDurations.reduce((a: any, b: any) =>
-        a > b ? a : b
-      ),
+    averageInputFocusedDuration.duration = Math.trunc(
+      averageInputFocusedDuration.duration /
+        (submissions.length * submissions[0].fields.length)
+    );
+
+    result.inputFocusedDuration = {
+      shortest: {
+        ...shortestInputFocusedDuration,
+        duration: convertTimeStampToHourAndMinute(
+          shortestInputFocusedDuration.duration
+        ),
+      },
+      average: {
+        duration: convertTimeStampToHourAndMinute(
+          averageInputFocusedDuration.duration
+        ),
+      },
+      longest: {
+        ...longestInputFocusedDuration,
+        duration: convertTimeStampToHourAndMinute(
+          longestInputFocusedDuration.duration
+        ),
+      },
     };
 
     // submissionTime
@@ -103,61 +186,94 @@ export const getBehaviorByFormId = async (
       const hour = submission.submissionDate.getHours();
       let minute = submission.submissionDate.getMinutes();
       minute += hour * 60;
-      return minute;
+      return { country: submission.country, minute };
     });
 
     const shortestSubmissionTime = submissionTimes.reduce((a: any, b: any) =>
-      a < b ? a : b
+      a.minute < b.minute ? a : b
     );
     const averageSubmissionTime = Math.trunc(
-      submissionTimes.reduce((a: any, b: any) => a + b, 0) / submissions.length
+      submissionTimes.reduce((a: any, b: any) => a + b.minute, 0) /
+        submissions.length
     );
     const longestSubmissionTime = submissionTimes.reduce((a: any, b: any) =>
-      a > b ? a : b
+      a.minute > b.minute ? a : b
     );
-    const submissionTime = {
-      shortest: `${Math.trunc(shortestSubmissionTime / 60)}:${shortestSubmissionTime % 60}`,
-      average: `${Math.trunc(averageSubmissionTime / 60)}:${averageSubmissionTime % 60}`,
-      longest: `${Math.trunc(longestSubmissionTime / 60)}:${longestSubmissionTime % 60}`,
+
+    result.submissionTime = {
+      earliest: {
+        country: shortestSubmissionTime.country,
+        time: convertMinuteToHourAndMinute(shortestSubmissionTime.minute),
+      },
+      average: { time: convertMinuteToHourAndMinute(averageSubmissionTime) },
+      latest: {
+        country: longestSubmissionTime.country,
+        time: convertMinuteToHourAndMinute(longestSubmissionTime.minute),
+      },
     };
 
     // country
-    let countriesMap:any = {}
+    let countriesMap: any = {};
     submissions.forEach((submission: any) => {
       if (countriesMap[submission.country]) {
-        countriesMap[submission.country] += 1
+        countriesMap[submission.country] += 1;
       } else {
-        countriesMap[submission.country] = 1
+        countriesMap[submission.country] = 1;
       }
-    })
+    });
 
-    const country = {
-      most: Object.keys(countriesMap).reduce((a, b) => countriesMap[a] > countriesMap[b] ? a : b),
-      least: Object.keys(countriesMap).reduce((a, b) => countriesMap[a] < countriesMap[b] ? a : b),
-    }
+    const mostCountry = Object.keys(countriesMap).reduce((a, b) =>
+      countriesMap[a] > countriesMap[b] ? a : b
+    );
+
+    const leastCountry = Object.keys(countriesMap).reduce((a, b) =>
+      countriesMap[a] < countriesMap[b] ? a : b
+    );
+
+    result.country = {
+      most: {
+        name: mostCountry,
+        count: countriesMap[mostCountry],
+      },
+      least: {
+        name: leastCountry,
+        count: countriesMap[leastCountry],
+      },
+    };
 
     // device
-    let devicesMap:any = {}
+    let devicesMap: any = {};
     submissions.forEach((submission: any) => {
       if (devicesMap[submission.device]) {
-        devicesMap[submission.device] += 1
+        devicesMap[submission.device] += 1;
       } else {
-        devicesMap[submission.device] = 1
+        devicesMap[submission.device] = 1;
       }
-    })
+    });
 
-    const device = {
-      most: Object.keys(devicesMap).reduce((a, b) => devicesMap[a] > devicesMap[b] ? a : b),
-      least: Object.keys(devicesMap).reduce((a, b) => devicesMap[a] < devicesMap[b] ? a : b),
-    }
+    const mostDevice = Object.keys(devicesMap).reduce((a, b) =>
+      devicesMap[a] > devicesMap[b] ? a : b
+    );
+
+    const leastDevice = Object.keys(devicesMap).reduce((a, b) =>
+      devicesMap[a] < devicesMap[b] ? a : b
+    );
+
+    result.device = {
+      most: {
+        name: mostDevice,
+        count: devicesMap[mostDevice],
+      },
+      least: {
+        name: leastDevice,
+        count: devicesMap[leastDevice],
+      },
+    };
 
     return res.status(200).json({
-      totalFormDuration,
-      formFocusedDuration,
-      inputFocusedDuration,
-      submissionTime,
-      country,
-      device,
+      ...result,
+      success: true,
+      message: "Success",
       submissions,
     });
   } catch (error) {
