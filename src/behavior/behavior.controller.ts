@@ -100,8 +100,8 @@ export const getBehaviorByFormId = async (
 
     result.totalFormDuration = {
       shortest: convertTimeStampToHourAndMinute(
-        longestTotalFormDuration.activeTime +
-          longestTotalFormDuration.inactiveTime
+        shortestTotalFormDuration.activeTime +
+        shortestTotalFormDuration.inactiveTime
       ),
       average: convertTimeStampToHourAndMinute(averageTotalFormDuration),
       longest: convertTimeStampToHourAndMinute(
