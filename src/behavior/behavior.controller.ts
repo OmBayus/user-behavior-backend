@@ -293,7 +293,12 @@ export const create = async (req: express.Request, res: express.Response) => {
     if (ipAddress) {
       const geo = geoip.lookup(ipAddress as string);
       if (geo) {
+        console.log(geo)
         country = geo.country;
+        if(country){
+          var countries = require('country-data').countries;
+          country = countries[country].name
+        }
       }
     }
     return res.status(200).json({
