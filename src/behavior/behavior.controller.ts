@@ -101,7 +101,7 @@ export const getBehaviorByFormId = async (
     result.totalFormDuration = {
       shortest: convertTimeStampToHourAndMinute(
         shortestTotalFormDuration.activeTime +
-        shortestTotalFormDuration.inactiveTime
+          shortestTotalFormDuration.inactiveTime
       ),
       average: convertTimeStampToHourAndMinute(averageTotalFormDuration),
       longest: convertTimeStampToHourAndMinute(
@@ -284,7 +284,9 @@ export const getBehaviorByFormId = async (
 
 export const create = async (req: any, res: express.Response) => {
   try {
-    const device = parseUserAgent(req.headers["user-agent"]).device || req.device.type.toUpperCase();
+    const device =
+      parseUserAgent(req.headers["user-agent"]).device ||
+      req.device.type.toUpperCase();
 
     let ipAddress =
       (req.headers["x-forwarded-for"] as string) ||
@@ -293,11 +295,11 @@ export const create = async (req: any, res: express.Response) => {
     if (ipAddress) {
       const geo = geoip.lookup(ipAddress as string);
       if (geo) {
-        console.log(geo)
+        console.log({ ...geo, ipAddress, device });
         country = geo.country;
-        if(country){
-          var countries = require('country-data').countries;
-          country = countries[country].name
+        if (country) {
+          var countries = require("country-data").countries;
+          country = countries[country].name;
         }
       }
     }
