@@ -5,6 +5,10 @@ import { PORT } from "./utils/config";
 
 const app = express();
 
+var device = require('express-device');
+ 
+app.use(device.capture());
+
 app.use(compression());
 app.use(cors());
 
