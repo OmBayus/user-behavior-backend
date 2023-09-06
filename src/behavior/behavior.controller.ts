@@ -44,14 +44,14 @@ export const getBehaviorByFormId = async (
       submissionTime: {
         earliest: {
           country: "",
-          time: "00:00",
+          time: 0,
         },
         average: {
-          time: "00:00",
+          time: 0,
         },
         latest: {
           country: "",
-          time: "00:00",
+          time: 0,
         },
       },
       country: {
@@ -203,12 +203,12 @@ export const getBehaviorByFormId = async (
     result.submissionTime = {
       earliest: {
         country: shortestSubmissionTime.country,
-        time: convertMinuteToHourAndMinute(shortestSubmissionTime.minute),
+        time: shortestSubmissionTime.minute,
       },
-      average: { time: convertMinuteToHourAndMinute(averageSubmissionTime) },
+      average: { time: averageSubmissionTime },
       latest: {
         country: longestSubmissionTime.country,
-        time: convertMinuteToHourAndMinute(longestSubmissionTime.minute),
+        time: longestSubmissionTime.minute,
       },
     };
 
