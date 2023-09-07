@@ -83,7 +83,7 @@ export const getBehaviorByFormId = async (
     // if no submissions found
     if (submissions === undefined || submissions.length === 0) {
       result.message = "No submissions found";
-      return res.status(200).json(result);
+      return res.status(200).json({...result,submissions:[]});
     }
 
     // totalFormDuration
