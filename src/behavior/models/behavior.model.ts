@@ -1,6 +1,7 @@
 import * as mongoose from "mongoose";
 
 const behaviorSchema = new mongoose.Schema({
+  fullname: String,
   formId: String,
   ipAddress: String,
   device: String,

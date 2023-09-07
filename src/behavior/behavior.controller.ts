@@ -275,7 +275,7 @@ export const getBehaviorByFormId = async (
       success: true,
       message: "Success",
       submissions: submissions.map(submission=>({
-        name: submission.ipAddress,
+        name: submission.fullname || submission.ipAddress,
         date: submission.submissionDate,
         totalFormDuration: convertMinuteToHourAndMinute(
           submission.activeTime + submission.inactiveTime

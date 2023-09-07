@@ -3,6 +3,7 @@ class CreateBehaviorDto {
   activeTime: number;
   inactiveTime: number;
   location: string;
+  fullname: string;
   
 }
 
