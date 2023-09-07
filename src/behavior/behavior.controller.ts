@@ -280,8 +280,8 @@ export const getBehaviorByFormId = async (
         totalFormDuration: convertMinuteToHourAndMinute(
           submission.activeTime + submission.inactiveTime
         ),
-        formFocuesDuration: convertMinuteToHourAndMinute(submission.activeTime),
-        inputFocuesDuration: convertMinuteToHourAndMinute(submission.fields.reduce(
+        formFocusedDuration: convertMinuteToHourAndMinute(submission.activeTime),
+        inputFocusedDuration: convertMinuteToHourAndMinute(submission.fields.reduce(
           (a: any, b: any) => a + b.totalTime,
           0
         )),
