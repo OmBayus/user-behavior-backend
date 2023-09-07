@@ -274,7 +274,27 @@ export const getBehaviorByFormId = async (
       ...result,
       success: true,
       message: "Success",
-      submissions,
+      submissions: submissions.map(submission=>({
+        name: submission.ipAddress,
+        date: submission.submissionDate,
+        totalFormDuration: convertMinuteToHourAndMinute(
+          submission.activeTime + submission.inactiveTime
+        ),
+        formFocuesDuration: convertMinuteToHourAndMinute(submission.activeTime),
+        inputFocuesDuration: convertMinuteToHourAndMinute(submission.fields.reduce(
+          (a: any, b: any) => a + b.totalTime,
+          0
+        )),
+        submissionTime: submission.submissionDate.getHours() + submission.submissionDate.getMinutes(),
+        country: submission.country,
+        device: submission.device,
+        fields: submission.fields.map((field: any) => ({
+          name: field.name,
+          type: field.type,
+          totalTime: convertMinuteToHourAndMinute(field.totalTime),
+        })),
+      })
+      )
     });
   } catch (error) {
     console.log(error);
