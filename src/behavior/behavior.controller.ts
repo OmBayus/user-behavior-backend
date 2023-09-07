@@ -325,6 +325,7 @@ export const create = async (req: any, res: express.Response) => {
     }
     return res.status(200).json({
       behavior: await behaviorRepository.create({
+        fullname: req.body.fullname,
         formId: req.body.formId,
         ipAddress: ipAddress || "N/A",
         device,
