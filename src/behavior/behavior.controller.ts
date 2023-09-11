@@ -6,6 +6,7 @@ import behaviorRepository from "./behavior.repository";
 import {
   convertTimeStampToHourAndMinute,
   convertMinuteToHourAndMinute,
+  convertMicrosecondsToMinuteAndSeconds,
 } from "../utils/date.converter";
 
 export const getBehaviorByFormId = async (
@@ -276,12 +277,12 @@ export const getBehaviorByFormId = async (
       message: "Success",
       submissions: submissions.map(submission=>({
         name: submission.fullname || submission.ipAddress,
-        date: submission.submissionDate,
-        totalFormDuration: convertMinuteToHourAndMinute(
+        date: (new Date(submission.submissionDate)).toISOString().split('T')[0],
+        totalFormDuration: convertMicrosecondsToMinuteAndSeconds(
           submission.activeTime + submission.inactiveTime
         ),
-        formFocusedDuration: convertMinuteToHourAndMinute(submission.activeTime),
-        inputFocusedDuration: convertMinuteToHourAndMinute(submission.fields.reduce(
+        formFocusedDuration: convertMicrosecondsToMinuteAndSeconds(submission.activeTime),
+        inputFocusedDuration: convertMicrosecondsToMinuteAndSeconds(submission.fields.reduce(
           (a: any, b: any) => a + b.totalTime,
           0
         )),
@@ -291,7 +292,7 @@ export const getBehaviorByFormId = async (
         fields: submission.fields.map((field: any) => ({
           name: field.name,
           type: field.type,
-          totalTime: convertMinuteToHourAndMinute(field.totalTime),
+          totalTime: convertMicrosecondsToMinuteAndSeconds(field.totalTime),
         })),
       })
       )

@@ -28,3 +28,19 @@ export const convertMinuteToHourAndMinute = (time: number) => {
 
   return `${hours}:${mins}`;
 };
+
+
+export const convertMicrosecondsToMinuteAndSeconds = (time:number)=>{
+  let mins: number | string = Math.floor(time / 60000);
+  let secs: number | string = ((time % 60000) / 1000).toFixed(0);
+
+  if (mins < 10) {
+    mins = `0${mins}`;
+  }
+
+  if (Number(secs) < 10) {
+    secs = `0${secs}`;
+  }
+
+  return `${mins}:${secs}`;
+}
