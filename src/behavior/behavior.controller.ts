@@ -286,7 +286,7 @@ export const getBehaviorByFormId = async (
           (a: any, b: any) => a + b.totalTime,
           0
         )),
-        submissionTime: submission.submissionDate.getHours() + submission.submissionDate.getMinutes(),
+        submissionTime: submission.submissionDate.getHours()*60 + submission.submissionDate.getMinutes(),
         country: submission.country,
         device: submission.device,
         fields: submission.fields.map((field: any) => ({
