@@ -4,9 +4,9 @@ import geoip from "geoip-lite";
 
 import behaviorRepository from "./behavior.repository";
 import {
-  convertTimeStampToHourAndMinute,
+  convertTimeStampToHourAndMinuteAndSecs,
   convertMinuteToHourAndMinute,
-  convertMicrosecondsToMinuteAndSeconds,
+  convertMicrosecondsToHourAndMinuteAndSeconds,
   dateConverter,
 } from "../utils/date.converter";
 
@@ -101,12 +101,12 @@ export const getBehaviorByFormId = async (
     );
 
     result.totalFormDuration = {
-      shortest: convertTimeStampToHourAndMinute(
+      shortest: convertTimeStampToHourAndMinuteAndSecs(
         shortestTotalFormDuration.activeTime +
           shortestTotalFormDuration.inactiveTime
       ),
-      average: convertTimeStampToHourAndMinute(averageTotalFormDuration),
-      longest: convertTimeStampToHourAndMinute(
+      average: convertTimeStampToHourAndMinuteAndSecs(averageTotalFormDuration),
+      longest: convertTimeStampToHourAndMinuteAndSecs(
         longestTotalFormDuration.activeTime +
           longestTotalFormDuration.inactiveTime
       ),
@@ -114,16 +114,16 @@ export const getBehaviorByFormId = async (
 
     // formFocusedDuration
     result.formFocusedDuration = {
-      shortest: convertTimeStampToHourAndMinute(
+      shortest: convertTimeStampToHourAndMinuteAndSecs(
         submissions.reduce((a, b) => (a.activeTime < b.activeTime ? a : b))
           .activeTime
       ),
-      average: convertTimeStampToHourAndMinute(
+      average: convertTimeStampToHourAndMinuteAndSecs(
         Math.trunc(
           submissions.reduce((a, b) => a + b.activeTime, 0) / submissions.length
         )
       ),
-      longest: convertTimeStampToHourAndMinute(
+      longest: convertTimeStampToHourAndMinuteAndSecs(
         submissions.reduce((a, b) => (a.activeTime > b.activeTime ? a : b))
           .activeTime
       ),
@@ -166,18 +166,18 @@ export const getBehaviorByFormId = async (
     result.inputFocusedDuration = {
       shortest: {
         ...shortestInputFocusedDuration,
-        duration: convertTimeStampToHourAndMinute(
+        duration: convertTimeStampToHourAndMinuteAndSecs(
           shortestInputFocusedDuration.duration
         ),
       },
       average: {
-        duration: convertTimeStampToHourAndMinute(
+        duration: convertTimeStampToHourAndMinuteAndSecs(
           averageInputFocusedDuration.duration
         ),
       },
       longest: {
         ...longestInputFocusedDuration,
-        duration: convertTimeStampToHourAndMinute(
+        duration: convertTimeStampToHourAndMinuteAndSecs(
           longestInputFocusedDuration.duration
         ),
       },
@@ -279,11 +279,11 @@ export const getBehaviorByFormId = async (
       submissions: submissions.map(submission=>({
         name: submission.fullname || submission.ipAddress,
         date: dateConverter(submission.submissionDate),
-        totalFormDuration: convertMicrosecondsToMinuteAndSeconds(
+        totalFormDuration: convertMicrosecondsToHourAndMinuteAndSeconds(
           submission.activeTime + submission.inactiveTime
         ),
-        formFocusedDuration: convertMicrosecondsToMinuteAndSeconds(submission.activeTime),
-        inputFocusedDuration: convertMicrosecondsToMinuteAndSeconds(submission.fields.reduce(
+        formFocusedDuration: convertMicrosecondsToHourAndMinuteAndSeconds(submission.activeTime),
+        inputFocusedDuration: convertMicrosecondsToHourAndMinuteAndSeconds(submission.fields.reduce(
           (a: any, b: any) => a + b.totalTime,
           0
         )),
@@ -293,7 +293,7 @@ export const getBehaviorByFormId = async (
         fields: submission.fields.map((field: any) => ({
           name: field.name,
           type: field.type,
-          totalTime: convertMicrosecondsToMinuteAndSeconds(field.totalTime),
+          totalTime: convertMicrosecondsToHourAndMinuteAndSeconds(field.totalTime),
         })),
       })
       )

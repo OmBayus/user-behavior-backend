@@ -1,7 +1,12 @@
-export const convertTimeStampToHourAndMinute = (time: number) => {
-  let mins: number | string = new Date(time).getMinutes();
+export const convertTimeStampToHourAndMinuteAndSecs = (time: number) => {
+  const date = new Date(time);
+  let hours: number | string = date.getHours();
+  let mins: number | string = date.getMinutes();
+  let secs: number | string = date.getSeconds();
 
-  let secs: number | string = new Date(time).getSeconds();
+  if (hours < 10) {
+    hours = `0${hours}`;
+  }
 
   if (mins < 10) {
     mins = `0${mins}`;
@@ -11,7 +16,7 @@ export const convertTimeStampToHourAndMinute = (time: number) => {
     secs = `0${secs}`;
   }
 
-  return `${mins}:${secs}`;
+  return `${hours}:${mins}:${secs}`;
 };
 
 export const convertMinuteToHourAndMinute = (time: number) => {
@@ -30,10 +35,14 @@ export const convertMinuteToHourAndMinute = (time: number) => {
 };
 
 
-export const convertMicrosecondsToMinuteAndSeconds = (time:number)=>{
+export const convertMicrosecondsToHourAndMinuteAndSeconds = (time:number)=>{
+  let hours: number | string = Math.floor(time / 3600000);
   let mins: number | string = Math.floor(time / 60000);
   let secs: number | string = ((time % 60000) / 1000).toFixed(0);
 
+  if (hours < 10) {
+    hours = `0${hours}`;
+  }
   if (mins < 10) {
     mins = `0${mins}`;
   }
@@ -42,7 +51,7 @@ export const convertMicrosecondsToMinuteAndSeconds = (time:number)=>{
     secs = `0${secs}`;
   }
 
-  return `${mins}:${secs}`;
+  return `${hours}:${mins}:${secs}`;
 }
 
 export const dateConverter = (tarih: any) => {
