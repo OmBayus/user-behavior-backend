@@ -44,3 +44,11 @@ export const convertMicrosecondsToMinuteAndSeconds = (time:number)=>{
 
   return `${mins}:${secs}`;
 }
+
+export const dateConverter = (tarih) => {
+  const ayIsimleri = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const gun = tarih.getDate();
+  const ay = ayIsimleri[tarih.getMonth()];
+  const yil = tarih.getFullYear();
+  return `${ay} ${gun}, ${yil}`;
+}

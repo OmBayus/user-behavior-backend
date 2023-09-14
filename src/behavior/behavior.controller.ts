@@ -7,6 +7,7 @@ import {
   convertTimeStampToHourAndMinute,
   convertMinuteToHourAndMinute,
   convertMicrosecondsToMinuteAndSeconds,
+  dateConverter,
 } from "../utils/date.converter";
 
 export const getBehaviorByFormId = async (
@@ -277,7 +278,7 @@ export const getBehaviorByFormId = async (
       message: "Success",
       submissions: submissions.map(submission=>({
         name: submission.fullname || submission.ipAddress,
-        date: (new Date(submission.submissionDate)).toISOString().split('T')[0],
+        date: dateConverter(submission.submissionDate),
         totalFormDuration: convertMicrosecondsToMinuteAndSeconds(
           submission.activeTime + submission.inactiveTime
         ),
