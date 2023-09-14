@@ -306,9 +306,7 @@ export const getBehaviorByFormId = async (
 
 export const create = async (req: any, res: express.Response) => {
   try {
-    const device =
-      parseUserAgent(req.headers["user-agent"]).device ||
-      req.device.type.toUpperCase();
+    const device = req.device.type.toUpperCase();
 
     let ipAddress =
       (req.headers["x-forwarded-for"] as string) ||
